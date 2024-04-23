@@ -5,7 +5,7 @@
  Development board : STM32F407VGT6 Discovery Board
  IDE               : STM32CubeIDE
 
-Program to transmit single character and string using UART2 in polling mode.
+Program to receive data using UART2 in polling mode.
 
 *Enable clock for GPIOA using RCC_AHB1ENR_GPIOAEN bit in RCC->AHB1ENR.
 
