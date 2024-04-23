@@ -1,0 +1,6 @@
+main.c:52:5:main	1
+main.c:71:6:uart2_tx_init	1
+main.c:86:6:uart	1
+main.c:112:6:data_write	2
+main.c:123:6:string_write	3
+main.c:136:6:delay	2

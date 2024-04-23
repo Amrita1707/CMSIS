@@ -1,0 +1,6 @@
+../Src/main.c:52:5:main	8	static
+../Src/main.c:71:6:uart2_tx_init	4	static
+../Src/main.c:86:6:uart	4	static
+../Src/main.c:112:6:data_write	16	static
+../Src/main.c:123:6:string_write	16	static
+../Src/main.c:136:6:delay	16	static

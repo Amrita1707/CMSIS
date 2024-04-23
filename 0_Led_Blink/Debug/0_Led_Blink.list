@@ -39,11 +39,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_macro  000180bf  00000000  00000000  000108b0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000055f  00000000  00000000  0002896f  2**0
+ 18 .debug_line   00000561  00000000  00000000  0002896f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    00087b43  00000000  00000000  00028ece  2**0
+ 19 .debug_str    00087b43  00000000  00000000  00028ed0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  000b0a11  2**0
+ 20 .comment      00000050  00000000  00000000  000b0a13  2**0
                   CONTENTS, READONLY
  21 .debug_frame  00000084  00000000  00000000  000b0a64  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -79,6 +79,7 @@ Disassembly of section .text:
  80001e4:	08000324 	.word	0x08000324
 
 080001e8 <main>:
+
 #include <stdint.h>
 #include "stm32f407xx.h"
 
@@ -173,6 +174,7 @@ void delay(void)
     volatile int delay = 0;
  800025e:	2300      	movs	r3, #0
  8000260:	607b      	str	r3, [r7, #4]
+
     // Loop for delay
     for(delay = 0; delay < 100000; delay++);
  8000262:	2300      	movs	r3, #0
