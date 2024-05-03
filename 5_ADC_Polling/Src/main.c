@@ -1,142 +1,83 @@
 /*
-
  Author            : Amrita N S
- Date              : 23-04-2024
+ Date              : 03-04-2024
  Development board : STM32F407VGT6 Discovery Board
  IDE               : STM32CubeIDE
 
-Program to receive data using UART2 in polling mode.
+ Interfacing a Potentiometer with an ADC
 
-*Enable clock for GPIOA using RCC_AHB1ENR_GPIOAEN bit in RCC->AHB1ENR.
+ 1. Activate the ADC clock by setting the corresponding bit in the RCC_APB2ENR register.
 
-*Configure PA2 for USART TX by setting the appropriate bits in GPIOA->MODER and GPIOA->AFR[0].
+ 2. Configure the ADC for right alignment of results (ALIGN) and continuous conversion mode (CONT) using the ADC_CR2 register.
 
- *Configure PA3 for USART RX by setting the appropriate bits in GPIOA->MODER and GPIOA->AFR[0].
+ 3. Utilize the ADC_CR1 register to set the desired resolution and select the analog input channel.
 
-*Enable clock for USART2 using RCC_APB1ENR_USART2EN bit in RCC->APB1ENR.
+ 4. Configure the input pin for the analog input channel using the GPIOx_MODER register.
 
-*Set baud rate to 9600 by writing to USART2->BRR.
+ 5. Enable the ADC and initiate the conversion process by setting the appropriate bits in the ADC_CR2 register (ADON and SWSTART).
 
-*Enable transmitter (TE) and USART (UE) using USART_CR1_TE and USART_CR1_UE bits in USART2->CR1.
+ 6. Continuously monitor the end-of-conversion (EOC) flag in the ADC_SR register.
 
-*Enable Receiver (RE) using USART_CR1_RE bit in USART2->CR1.
+ 7. Upon detection of the EOC flag being set, retrieve the ADC data result from the ADC_DR register and store it.
 
-*Configure word length and stop bits using bits in USART2->CR1 and USART2->CR2.
+ 8. Repeat steps 6 and 7 for subsequent conversions.
 
-*Wait for transmit data register empty flag (USART_SR_TXE) in USART2->SR.
 
-*Wait for receive data register empty flag (USART_SR_RXNE) in USART2->SR.
-
-*Write data to transmit buffer by writing to USART2->DR.
-
-*Receive data from USART2->DR.
-
- */
-
+*/
 
 #include "stm32f407xx.h"
 
-// Function to initialize UART2 TX pin
-void uart2_tx_init(void);
+// Function prototypes
+void adc_init(void);
+void gpio_config(void);
 
-void uart2_rx_init(void);
-// Function to configure UART2 module
-void uart(void);
-
-// Function to transmit a single character over UART
-void data_write(char);
-
-// Function to receive character over UART
-char data_read();
-
-// Function to transmit a string over UART
-void string_write(char *);
+// Global variable to store ADC conversion result
+unsigned int result;
 
 int main(void)
 {
-	char ch;
-    uart2_tx_init();
-    uart();
-    uart2_rx_init();
+    // Initialize ADC and GPIO
+    adc_init();
+    gpio_config();
+
+    // Infinite loop for continuous ADC conversion
     while(1)
     {
-    	ch = data_read();
-    	data_write(ch);
+        // Start the conversion
+        ADC1->CR2 |= ADC_CR2_SWSTART;
+
+        // Wait until conversion is complete
+        while(!(ADC1->SR & ADC_SR_EOC)){}
+
+        // Read the conversion result
+        result = ADC1->DR;
     }
 }
 
-// Function to initialize UART2 TX pin
-void uart2_tx_init(void)
+void gpio_config()
 {
-    // Enable clock access to GPIOA
+    // Enable the clock access to GPIOA
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 
-    // Set PA2 mode to alternate function mode
-    GPIOA->MODER |= GPIO_MODER_MODE2_1;
-    GPIOA->MODER &= ~GPIO_MODER_MODE2_0;
-
-    // Set PA2 alternate function type to USART_TX
-    GPIOA->AFR[0] |= GPIO_AFRL_AFRL2_2 | GPIO_AFRL_AFRL2_1 | GPIO_AFRL_AFRL2_0;
-    GPIOA->AFR[0] &= ~GPIO_AFRL_AFRL2_3;
+    // Set PA0 pin as analog mode
+    GPIOA->MODER |= GPIO_MODER_MODE0_0 | GPIO_MODER_MODE0_1;
 }
 
-// Function to configure UART2 module
-void uart(void)
+void adc_init(void)
 {
-    // Enable clock access to USART2
-    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
+    // Enable the clock access to ADC
+    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
 
-    // Set UART baud rate to 9600
-    USART2->BRR = 0x0683;
+    // Select the resolution of conversion
+    //00: 12-bit (15 ADCCLK cycles)
+    ADC1->CR1 &= ~ADC_CR1_RES_0 & ~ADC_CR1_RES_1 ;
 
-    //Enable the  Transmitter by set TE bit in USART_CR1 register.
-    USART2->CR1 |= USART_CR1_TE;
+    // Set alignment to right (result in DR register)
+    ADC1->CR2 &= ~ADC_CR2_ALIGN;
 
-    //Enable the USART by set UE bit in USART_CR1 register.
-    USART2->CR1 |= USART_CR1_UE;
+    // Enable continuous conversion mode
+    ADC1->CR2 |= ADC_CR2_CONT;
 
-    // Define the word length by M bit in USART_CR1
-    //M=0 : 1 Start bit, 8 Data bits, n Stop bit
-    USART2->CR1 &= ~USART_CR1_M;
-
-    //Define number of stop bits in USART_CR2
-    //Bits 13:12 STOP: STOP bits
-    //00: 1 Stop bit
-    USART2->CR2 &= ~USART_CR2_STOP_0;
-    USART2->CR2 &= ~USART_CR2_STOP_1;
-}
-
-void uart2_rx_init(void)
-{
-	 //Enable the Receiver by set RE bit in USART_CR1 register.
-	  USART2->CR1 |= USART_CR1_RE;
-
-	  // Set PA3 mode to alternate function mode
-	  GPIOA->MODER |=  GPIO_MODER_MODE3_1;
-	  GPIOA->MODER &= ~GPIO_MODER_MODE3_0;
-
-	  // Set PA3 alternate function type to USART_RX
-	  GPIOA->AFR[0] |= GPIO_AFRL_AFRL3_2 | GPIO_AFRL_AFRL3_1 | GPIO_AFRL_AFRL3_0;
-	  GPIOA->AFR[0] &= ~GPIO_AFRL_AFRL3_3;
-}
-
-// Function to transmit a single character over UART
-void data_write(char data)
-{
-	// Wait until transmit data register is empty
-    while(!(USART2->SR & USART_SR_TXE)){}
-    {
-    	// Transmit data
-        USART2->DR = data;
-    }
-}
-
-// Function to receive data
-char data_read()
-{
-	while(!(USART2->SR & USART_SR_RXNE)){}
-	        {
-	        	//Receive data
-	            return USART2->DR;
-	        }
+    // Enable ADC
+    ADC1->CR2 |= ADC_CR2_ADON;
 }
