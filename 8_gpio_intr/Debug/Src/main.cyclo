@@ -1,0 +1,6 @@
+core_cm4.h:1684:22:__NVIC_EnableIRQ	2
+main.c:35:5:main	1
+main.c:42:6:clk_config	1
+main.c:54:6:intr	1
+main.c:79:6:mode_config	1
+main.c:89:6:EXTI0_IRQHandler	1

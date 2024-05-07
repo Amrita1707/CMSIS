@@ -1,0 +1,6 @@
+C:/CMSIS/8_gpio_intr/Core/Include/core_cm4.h:1684:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
+../Src/main.c:35:5:main	8	static
+../Src/main.c:42:6:clk_config	4	static
+../Src/main.c:54:6:intr	8	static,ignoring_inline_asm
+../Src/main.c:79:6:mode_config	4	static
+../Src/main.c:89:6:EXTI0_IRQHandler	4	static

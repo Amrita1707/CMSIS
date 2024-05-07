@@ -1,0 +1,5 @@
+../Src/main.c:35:5:main	8	static
+../Src/main.c:52:6:reload_val	4	static
+../Src/main.c:58:6:curr_val	4	static
+../Src/main.c:64:6:sys_timer	4	static
+../Src/main.c:70:6:gpio_pin_config	4	static
