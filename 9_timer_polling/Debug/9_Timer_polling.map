@@ -630,9 +630,9 @@ LOAD c:/st/stm32cubeide_1.12.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_macro   0x0000000000002109      0x11f ./Src/main.o
  .debug_macro   0x0000000000002228    0x15e97 ./Src/main.o
 
-.debug_line     0x0000000000000000      0x557
- .debug_line    0x0000000000000000      0x4d3 ./Src/main.o
- .debug_line    0x00000000000004d3       0x84 ./Startup/startup_stm32f407vgtx.o
+.debug_line     0x0000000000000000      0x55e
+ .debug_line    0x0000000000000000      0x4da ./Src/main.o
+ .debug_line    0x00000000000004da       0x84 ./Startup/startup_stm32f407vgtx.o
 
 .debug_str      0x0000000000000000    0x87bb0
  .debug_str     0x0000000000000000    0x87b7f ./Src/main.o

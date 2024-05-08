@@ -17,9 +17,11 @@ int count =0;
 int main()
 {
    clk_config();
-   timer_config();
    gpio_config();
+   timer_config();
 
+   while(1)
+   {
    while(!(TIM7->SR & 1)){}
    {
 	   TIM7->SR &= 0;
@@ -28,7 +30,10 @@ int main()
 	   {
 	   // Toggle GPIOD Pin 12 (LED)
 	   GPIOD->ODR ^= GPIO_ODR_OD12;
+
+	   count=0;
 	   }
+    }
    }
 }
 
@@ -50,12 +55,13 @@ void gpio_config()
 
 void timer_config()
 {
-	//Counter enabled
-	TIM7->CR1 |= TIM_CR1_CEN;
 
 	//Counter value
 	TIM7->CNT = 0;
 
 	// Auto-reload value
 	TIM7->ARR = 16000;
+
+	//Counter enabled
+	TIM7->CR1 |= TIM_CR1_CEN;
 }
