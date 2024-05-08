@@ -1,9 +1,26 @@
 /*
 
 Author            : Amrita N S
-Date              : 06-05-2024
+Date              : 08-05-2024
 Development board : STM32F407VGT6 Discovery Board
 IDE               : STM32CubeIDE
+
+Program to toggle led in every 1 seconds by using basic timer (Timer7-polling method)
+
+*Initializes the clock configuration for TIM7 and GPIOD peripherals by enabling their respective clock signals in the RCC peripheral.
+
+*Configure GPIOD Pin 12 as an output pin by setting the corresponding mode bits in the MODER register.
+
+*The timer configuration function sets up TIM7. It initializes the counter value (CNT) to 0 and sets the auto-reload value (ARR) to 16000.
+
+*After configuring the timer, the main loop waits until the update interrupt flag (UIF) of TIM7 status register (SR) is set.
+
+*Once the flag is set, it clears the flag, increments a count variable, and checks if the count has reached 1000.
+
+*If the count reaches 1000, it toggles the state of GPIOD Pin 12, effectively toggling the LED connected to it.
+
+*The loop continues indefinitely, ensuring that the LED toggles approximately every second.
+
 */
 
 
@@ -22,18 +39,21 @@ int main()
 
    while(1)
    {
-   while(!(TIM7->SR & 1)){}
-   {
-	   TIM7->SR &= 0;
-	   count++;
-	   if(count == 1000)
+      //wait until UIF bit of the TIM7 status register is set
+	   while(!(TIM7->SR & 1)){}
 	   {
-	   // Toggle GPIOD Pin 12 (LED)
-	   GPIOD->ODR ^= GPIO_ODR_OD12;
+		   //clear UIF bit
+		   TIM7->SR &= 0;
 
-	   count=0;
+		   count++;
+		   if(count == 1000)
+		   {
+			   // Toggle GPIOD Pin 12 (LED) for every 1seconds
+			   GPIOD->ODR ^= GPIO_ODR_OD12;
+
+			   count=0;
+		   }
 	   }
-    }
    }
 }
 

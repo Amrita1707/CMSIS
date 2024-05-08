@@ -39,11 +39,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_macro  000180bf  00000000  00000000  00010a00  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000055e  00000000  00000000  00028abf  2**0
+ 18 .debug_line   00000560  00000000  00000000  00028abf  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    00087bb0  00000000  00000000  0002901d  2**0
+ 19 .debug_str    00087bb0  00000000  00000000  0002901f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  000b0bcd  2**0
+ 20 .comment      00000050  00000000  00000000  000b0bcf  2**0
                   CONTENTS, READONLY
  21 .debug_frame  000000b8  00000000  00000000  000b0c20  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -96,52 +96,55 @@ int main()
 
    while(1)
    {
-   while(!(TIM7->SR & 1)){}
+      //wait until UIF bit of the TIM7 status register is set
+	   while(!(TIM7->SR & 1)){}
  80001f8:	bf00      	nop
  80001fa:	4b0f      	ldr	r3, [pc, #60]	; (8000238 <main+0x50>)
  80001fc:	691b      	ldr	r3, [r3, #16]
  80001fe:	f003 0301 	and.w	r3, r3, #1
  8000202:	2b00      	cmp	r3, #0
  8000204:	d0f9      	beq.n	80001fa <main+0x12>
-   {
-	   TIM7->SR &= 0;
+	   {
+		   //clear UIF bit
+		   TIM7->SR &= 0;
  8000206:	4b0c      	ldr	r3, [pc, #48]	; (8000238 <main+0x50>)
  8000208:	691b      	ldr	r3, [r3, #16]
  800020a:	4b0b      	ldr	r3, [pc, #44]	; (8000238 <main+0x50>)
  800020c:	2200      	movs	r2, #0
  800020e:	611a      	str	r2, [r3, #16]
-	   count++;
+
+		   count++;
  8000210:	4b0a      	ldr	r3, [pc, #40]	; (800023c <main+0x54>)
  8000212:	681b      	ldr	r3, [r3, #0]
  8000214:	3301      	adds	r3, #1
  8000216:	4a09      	ldr	r2, [pc, #36]	; (800023c <main+0x54>)
  8000218:	6013      	str	r3, [r2, #0]
-	   if(count == 1000)
+		   if(count == 1000)
  800021a:	4b08      	ldr	r3, [pc, #32]	; (800023c <main+0x54>)
  800021c:	681b      	ldr	r3, [r3, #0]
  800021e:	f5b3 7f7a 	cmp.w	r3, #1000	; 0x3e8
  8000222:	d1e9      	bne.n	80001f8 <main+0x10>
-	   {
-	   // Toggle GPIOD Pin 12 (LED)
-	   GPIOD->ODR ^= GPIO_ODR_OD12;
+		   {
+			   // Toggle GPIOD Pin 12 (LED) for every 1seconds
+			   GPIOD->ODR ^= GPIO_ODR_OD12;
  8000224:	4b06      	ldr	r3, [pc, #24]	; (8000240 <main+0x58>)
  8000226:	695b      	ldr	r3, [r3, #20]
  8000228:	4a05      	ldr	r2, [pc, #20]	; (8000240 <main+0x58>)
  800022a:	f483 5380 	eor.w	r3, r3, #4096	; 0x1000
  800022e:	6153      	str	r3, [r2, #20]
 
-	   count=0;
+			   count=0;
  8000230:	4b02      	ldr	r3, [pc, #8]	; (800023c <main+0x54>)
  8000232:	2200      	movs	r2, #0
  8000234:	601a      	str	r2, [r3, #0]
-   while(!(TIM7->SR & 1)){}
+	   while(!(TIM7->SR & 1)){}
  8000236:	e7df      	b.n	80001f8 <main+0x10>
  8000238:	40001400 	.word	0x40001400
  800023c:	2000001c 	.word	0x2000001c
  8000240:	40020c00 	.word	0x40020c00
 
 08000244 <clk_config>:
-    }
+	   }
    }
 }
 
