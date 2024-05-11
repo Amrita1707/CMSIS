@@ -1,5 +1,6 @@
-main.c:13:5:main	1
-main.c:38:6:clk_config	1
-main.c:48:6:gpio_config	1
-main.c:55:6:TIM6_delay_us	2
-main.c:81:6:TIM6_delay_ms	2
+main.c:15:5:main	5
+main.c:45:6:clk_config	1
+main.c:55:6:gpio_config	1
+main.c:62:6:timer	1
+main.c:77:6:start_signal	1
+main.c:84:6:dht_response	1

@@ -7,32 +7,38 @@
 #include "stm32f407xx.h"
 void clk_config();
 void gpio_config();
-void TIM6_delay_us(uint16_t);
-void TIM6_delay_ms(uint16_t);
-
+void timer();
+void dht_response();
+void start_signal();
+int count=0, count1;
 int main()
 {
 	clk_config();
 	gpio_config();
-
-
+	// Set PA1 high
+	GPIOA->ODR |= GPIO_ODR_OD1;
+	start_signal();
 	 while (1)
-	    {
-	        // Generate 16us delay
-	        GPIOA->ODR |= GPIO_ODR_OD5; // Set PA5 high
-	        TIM6_delay_us(16);
-
-	        GPIOA->ODR &= ~GPIO_ODR_OD5; // Set PA5 low
-
-	        // Generate 20ms delay
-	        TIM6_delay_ms(20);
-
-	        // Generate 80us delay
-	        GPIOA->ODR |= GPIO_ODR_OD5; // Set PA5 high
-	        TIM6_delay_us(80);
-	        GPIOA->ODR &= ~GPIO_ODR_OD5; // Set PA5 low
-	    }
-
+	 {
+		   //wait until UIF bit of the TIM7 status register is set
+		   while(!(TIM7->SR & 1)){}
+		   {
+		 	  //clear UIF bit
+		 	  TIM7->SR &= 0;
+		 	  while(++count <= 450)
+		 	  {
+		 		if(count == 450)
+		 		{
+		 			count1 = 1;
+		 			// Set PA1 high
+		 		    GPIOA->ODR |= GPIO_ODR_OD1;
+		 		    break;
+		 		}
+		 	  }
+		 	  if(count1 == 1)
+		 	    dht_response();
+		   }
+	  }
 }
 
 void clk_config()
@@ -48,58 +54,58 @@ void clk_config()
 void gpio_config()
 {
 	// set mode bits for GPIOA as output
-	GPIOA->MODER |= GPIO_MODER_MODE0_0;
-	GPIOA->MODER |= GPIO_MODER_MODE0_1;
+	GPIOA->MODER |= GPIO_MODER_MODE1_0;
+	GPIOA->MODER &= ~GPIO_MODER_MODE1_1;
 }
 
-void TIM6_delay_us(uint16_t us)
+void timer()
 {
-    // Enable TIM6 clock
-    RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+	// Enable TIM6 clock
+	RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
 
-    // Reset TIM6
-    RCC->APB1RSTR |= RCC_APB1RSTR_TIM6RST;
-    RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM6RST;
+	//Counter value
+	TIM7->CNT = 0;
 
-    // Set the prescaler value
-    TIM6->PSC = 16000000 / 1000000 - 1; // Prescaler for 1us
+	// Auto-reload value
+	TIM7->ARR = 640;
 
-    // Calculate the ARR value
-    TIM6->ARR = us;
-
-    // Enable the counter
-    TIM6->CR1 |= TIM_CR1_CEN;
-
-    // Wait until the counter reaches the ARR value
-    while (!(TIM6->SR & TIM_SR_UIF))
-        ;
-
-    // Reset the update event flag
-    TIM6->SR &= ~TIM_SR_UIF;
+	//Counter enabled
+	TIM7->CR1 |= TIM_CR1_CEN;
 }
 
-void TIM6_delay_ms(uint16_t ms)
+void start_signal()
 {
-    // Enable TIM6 clock
-    RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
-
-    // Reset TIM6
-    RCC->APB1RSTR |= RCC_APB1RSTR_TIM6RST;
-    RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM6RST;
-
-    // Set the prescaler value
-    TIM6->PSC = 16000000 / 1000 - 1; // Prescaler for 1ms
-
-    // Calculate the ARR value
-    TIM6->ARR = ms;
-
-    // Enable the counter
-    TIM6->CR1 |= TIM_CR1_CEN;
-
-    // Wait until the counter reaches the ARR value
-    while (!(TIM6->SR & TIM_SR_UIF))
-        ;
-
-    // Reset the update event flag
-    TIM6->SR &= ~TIM_SR_UIF;
+	// Set PA1 low
+	GPIOA->ODR &= ~GPIO_ODR_OD1;
 }
+
+
+void dht_response()
+{
+
+	//Set PA1 pin as input
+	GPIOA->MODER &= ~GPIO_MODER_MODE1_0;
+	GPIOA->MODER &= ~GPIO_MODER_MODE1_1;
+}
+
+	/*	// Check if GPIOA Pin 1 is low or not
+		if(GPIOA->IDR & 0x00)
+		{
+			count1 =1 ;
+		}
+
+		if(GPIOA->IDR & 0x10)
+		{
+			data_rx();
+		}
+	}*/
+
+/*void data_rx()
+{
+	int i,humidity;
+	for(i=0; i<15; i++)
+	{
+		humidity = ( humidity * 10) + ((GPIOA->IDR)>>1) ;
+		TIM7_delay_us(50);
+	}
+}*/
