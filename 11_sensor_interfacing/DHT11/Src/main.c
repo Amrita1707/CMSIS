@@ -8,40 +8,50 @@
 void clk_config();
 void gpio_config();
 void dht_response();
-int i,j,k,l,m,n;
+void delay(int);
+//void rc_data();
 int data;
+
 int main()
 {
 	clk_config();
 	gpio_config();
 	// Set PA1 high
 	GPIOA->ODR |= GPIO_ODR_OD1;
-	for(i=0; i<18000; i++)
+
+	while(1)
 	{
 		// Set PA1 low
-	    GPIOA->ODR &= ~GPIO_ODR_OD1;
-	}
-	for(j=0; j<40; j++)
-	{
+		GPIOA->ODR &= ~GPIO_ODR_OD1;
+		delay(18000);
+
 		// Set PA1 high
 		GPIOA->ODR |= GPIO_ODR_OD1;
-	}
-	dht_response();
-	for(k=0; k<54; k++)
-	{
-		if(GPIOA->IDR & 0x10)
-			break;
-	}
-	for(l=0; l<80; l++)
-	{
-		if(GPIOA->IDR & 0x00)
-			break;
-	}
+		delay(40);
 
-	for(m=0; m<54; m++)
-	{
-		if(GPIOA->IDR & 0x00)
-		{
+		dht_response();
+
+	    if(GPIOA->IDR & 0x00){}
+	    delay(54);
+
+	    if(GPIOA->IDR & 0x10){}
+	    delay(80);
+
+	    //rc_data();
+    }
+}
+
+void delay(int d)
+{
+	volatile int i;
+	for(i=0; i<d; i++){}
+}
+
+/*void rc_data()
+{
+
+  if(GPIOA->IDR & 0x00){}
+     delay(54);
 			for(n=1; n<=40;)
 			{
 				if(GPIOA->IDR & 0x10)
@@ -63,9 +73,8 @@ int main()
 
 			}
 
-		}
-	}
 }
+*/
 
 void clk_config()
 {
@@ -86,7 +95,6 @@ void dht_response()
 	GPIOA->MODER &= ~GPIO_MODER_MODE1_0;
 	GPIOA->MODER &= ~GPIO_MODER_MODE1_1;
 }
-
 
 
 
